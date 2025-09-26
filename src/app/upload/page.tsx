@@ -2,7 +2,8 @@
 
 import { useMutation } from '@tanstack/react-query';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import * as faceapi from 'face-api.js';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 
 type PredictionResponse = {
@@ -16,10 +17,51 @@ type ErrorResponse = {
 
 const API_URL = 'http://127.0.0.1:5000/predict';
 
+const FACE_DETECTOR_OPTIONS = new faceapi.TinyFaceDetectorOptions({
+  inputSize: 512,
+  scoreThreshold: 0.45,
+});
+
 export default function UploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+
+  const [isModelLoading, setIsModelLoading] = useState(true);
+  const [modelError, setModelError] = useState<string | null>(null);
+  const [isValidatingFile, setIsValidatingFile] = useState(false);
+
+  const validationIdRef = useRef(0);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadModels = async () => {
+      try {
+        await Promise.all([
+          faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+          faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+          faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+        ]);
+
+        if (isMounted) {
+          setIsModelLoading(false);
+        }
+      } catch (error) {
+        console.error('Failed to load face detection models', error);
+        if (isMounted) {
+          setModelError('Gagal memuat model pendeteksi wajah.');
+          setIsModelLoading(false);
+        }
+      }
+    };
+
+    loadModels();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!selectedFile) {
@@ -76,26 +118,112 @@ export default function UploadPage() {
     },
   });
 
+  const validateFaceImage = useCallback(async (file: File) => {
+    const objectUrl = URL.createObjectURL(file);
+    const fallbackMessage = 'Gambar tidak dapat diproses. Pastikan format file valid dan wajah terlihat jelas.';
+
+    try {
+      const image = await faceapi.fetchImage(objectUrl);
+      const detection = await faceapi.detectSingleFace(
+        image,
+        FACE_DETECTOR_OPTIONS
+      );
+
+      if (!detection) {
+        throw new Error(
+          'Tidak ditemukan wajah pada gambar. Gunakan foto dengan wajah jelas.'
+        );
+      }
+    } catch (error) {
+      if (error instanceof Error && error.message) {
+        if (error.message.toLowerCase().includes('wajah')) {
+          throw error;
+        }
+      }
+
+      throw new Error(fallbackMessage);
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
+  }, []);
+
   const handleFileChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
+    async (event: ChangeEvent<HTMLInputElement>) => {
       const input = event.target;
       const file = input.files?.[0] ?? null;
 
-      setSelectedFile(file);
+      setSelectedFile(null);
       setFormError(null);
+      mutation.reset();
 
-      if (file) {
-        mutation.reset();
+      if (!file) {
+        input.value = '';
+        return;
+      }
+
+      if (isModelLoading) {
+        setFormError('Model pendeteksi wajah sedang dimuat. Coba lagi dalam beberapa saat.');
+        input.value = '';
+        return;
+      }
+
+      if (modelError) {
+        setFormError(modelError);
+        input.value = '';
+        return;
+      }
+
+      validationIdRef.current += 1;
+      const currentValidationId = validationIdRef.current;
+
+      setIsValidatingFile(true);
+
+      try {
+        await validateFaceImage(file);
+
+        if (validationIdRef.current === currentValidationId) {
+          setSelectedFile(file);
+        }
+      } catch (error) {
+        const fallbackMessage =
+          'Gambar tidak dapat diproses. Pastikan format file valid dan wajah terlihat jelas.';
+        const message =
+          error instanceof Error && error.message
+            ? error.message
+            : fallbackMessage;
+
+        if (validationIdRef.current === currentValidationId) {
+          setFormError(message.toLowerCase().includes('wajah') ? message : fallbackMessage);
+        }
+      } finally {
+        if (validationIdRef.current === currentValidationId) {
+          setIsValidatingFile(false);
+        }
       }
 
       input.value = '';
     },
-    [mutation]
+    [isModelLoading, modelError, mutation, validateFaceImage]
   );
 
   const handleSubmit = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+
+      if (isModelLoading) {
+        setFormError('Model pendeteksi wajah sedang dimuat. Silakan tunggu.');
+        return;
+      }
+
+      if (modelError) {
+        setFormError(modelError);
+        return;
+      }
+
+      if (isValidatingFile) {
+        setFormError('Pemeriksaan wajah pada gambar masih berlangsung.');
+        return;
+      }
 
       if (!selectedFile) {
         setFormError('Silakan pilih gambar wajah terlebih dahulu.');
@@ -105,13 +233,15 @@ export default function UploadPage() {
       setFormError(null);
       mutation.mutate(selectedFile);
     },
-    [mutation, selectedFile]
+    [isModelLoading, isValidatingFile, modelError, mutation, selectedFile]
   );
 
   const resetForm = useCallback(() => {
+    validationIdRef.current += 1;
     setSelectedFile(null);
     setPreviewUrl(null);
     setFormError(null);
+    setIsValidatingFile(false);
     mutation.reset();
   }, [mutation]);
 
@@ -121,7 +251,7 @@ export default function UploadPage() {
 
   const confidencePercent = confidenceValue !== null ? `${confidenceValue}%` : null;
 
-  const displayError = formError ?? mutation.error?.message ?? null;
+  const displayError = formError ?? modelError ?? mutation.error?.message ?? null;
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col items-center px-4 py-16">
@@ -177,9 +307,17 @@ export default function UploadPage() {
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
-                disabled={mutation.isPending}
+                disabled={mutation.isPending || isValidatingFile || isModelLoading || Boolean(modelError)}
                 className="w-full rounded-lg border border-slate-700/60 bg-slate-900/40 px-4 py-3 text-sm text-slate-200 file:mr-4 file:rounded-md file:border-none file:bg-emerald-500 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:border-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-400/60 disabled:cursor-not-allowed"
               />
+              <div className="space-y-1 text-xs">
+                {isModelLoading && (
+                  <p className="text-slate-400">Memuat model pendeteksi wajah...</p>
+                )}
+                {isValidatingFile && !isModelLoading && (
+                  <p className="text-emerald-200">Memeriksa wajah pada gambar...</p>
+                )}
+              </div>
             </div>
 
             <div className="flex w-full max-w-xs items-center justify-center">
@@ -199,16 +337,27 @@ export default function UploadPage() {
           <div className="flex flex-col items-center justify-between gap-3 text-sm text-slate-300 sm:flex-row">
             <button
               type="submit"
-              disabled={mutation.isPending}
+              disabled={
+                mutation.isPending ||
+                isValidatingFile ||
+                isModelLoading ||
+                Boolean(modelError)
+              }
               className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-white drop-shadow-[0_1px_2px_rgba(15,23,42,0.45)] transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {mutation.isPending ? 'Menganalisis...' : 'Prediksi Sekarang'}
+              {isModelLoading
+                ? 'Menyiapkan model...'
+                : isValidatingFile
+                ? 'Memeriksa wajah...'
+                : mutation.isPending
+                ? 'Menganalisis...'
+                : 'Prediksi Sekarang'}
             </button>
             {(selectedFile || mutation.isSuccess || Boolean(displayError)) && (
               <button
                 type="button"
                 onClick={resetForm}
-                disabled={mutation.isPending}
+                disabled={mutation.isPending || isValidatingFile}
                 className="inline-flex items-center justify-center rounded-full border border-slate-700/60 px-5 py-2 text-sm font-semibold text-slate-200 transition hover:border-slate-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Reset Form
