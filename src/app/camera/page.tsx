@@ -661,7 +661,7 @@ export default function CameraPage() {
               className="pointer-events-none absolute inset-0 h-full w-full"
             />
             {liveMetrics ? (
-              <div className="pointer-events-none absolute left-4 top-24 w-[15rem] max-w-[16rem] sm:left-6 sm:top-28 sm:w-64 flex flex-col gap-2 rounded-2xl border border-sky-400/40 bg-slate-950/80 p-4 text-xs text-slate-100 shadow-lg">
+              <div className="pointer-events-none absolute left-4 top-20 w-[13rem] max-w-[14rem] sm:left-6 sm:top-24 sm:w-60 lg:left-8 lg:top-28 flex flex-col gap-2 rounded-2xl border border-sky-400/40 bg-slate-950/80 p-4 text-xs text-slate-100 shadow-lg">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold uppercase tracking-[0.3em] text-sky-300">Live Akurasi</span>
                   <span className={`text-lg font-bold ${isCaptureReady ? "text-emerald-300" : "text-amber-300"}`}>
@@ -685,7 +685,7 @@ export default function CameraPage() {
                 <p className={`text-[0.68rem] font-medium ${liveStatusClass}`}>{liveStatusText}</p>
               </div>
             ) : (
-              <div className="pointer-events-none absolute left-4 top-24 sm:left-6 sm:top-28 rounded-full border border-slate-700/60 bg-slate-900/80 px-3 py-2 text-xs text-slate-300 shadow-lg">
+              <div className="pointer-events-none absolute left-4 top-20 sm:left-6 sm:top-24 lg:left-8 lg:top-28 rounded-full border border-slate-700/60 bg-slate-900/80 px-3 py-2 text-xs text-slate-300 shadow-lg">
                 Mencari wajah...
               </div>
             )}
