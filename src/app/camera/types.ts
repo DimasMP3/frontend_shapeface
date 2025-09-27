@@ -23,3 +23,10 @@ export type StepContent = {
   title: string;
   description: string;
 };
+
+export type MetricsDisplay = {
+  overallPercent: number | null;
+  detectionPercent: number | null;
+  centerPercent: number | null;
+  sizePercent: number | null;
+};

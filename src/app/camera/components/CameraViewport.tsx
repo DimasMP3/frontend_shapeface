@@ -3,14 +3,7 @@
 import type { MutableRefObject } from "react";
 import Webcam from "react-webcam";
 
-import type { Orientation, ScanStep } from "../types";
-
-export type MetricsDisplay = {
-  overallPercent: number | null;
-  detectionPercent: number | null;
-  centerPercent: number | null;
-  sizePercent: number | null;
-};
+import type { MetricsDisplay, Orientation, ScanStep } from "../types";
 
 type CameraViewportProps = {
   webcamRef: MutableRefObject<Webcam | null>;
