@@ -1,197 +1,185 @@
-﻿# Face Shape Detection AI
+﻿<div align="center">
+  <img src="https://img.shields.io/badge/Face%20Shape%20Detection-Gradient-8b5cf6?style=for-the-badge&logo=apachespark&logoColor=white" alt="Face Shape Detection" />
+  <h1 style="margin-top: 16px;">✨ Face Shape Detection AI ✨</h1>
+  <p>A vivid, animation-forward experience for discovering your face shape with guided camera capture and ML predictions.</p>
+  <p>
+    <img alt="Next.js" src="https://img.shields.io/badge/Next.js_15-black?style=flat-square&logo=next.js" />
+    <img alt="React" src="https://img.shields.io/badge/React_19-61dafb?style=flat-square&logo=react" />
+    <img alt="Tailwind" src="https://img.shields.io/badge/Tailwind_CSS_4-38bdf8?style=flat-square&logo=tailwind-css" />
+    <img alt="Flask" src="https://img.shields.io/badge/Flask_API-000000?style=flat-square&logo=flask" />
+    <img alt="TensorFlow" src="https://img.shields.io/badge/TensorFlow_Model-ff6f00?style=flat-square&logo=tensorflow" />
+  </p>
+</div>
 
-![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js) ![React](https://img.shields.io/badge/React-19-61dafb?logo=react) ![Tailwind](https://img.shields.io/badge/Tailwind%20CSS-4-38bdf8?logo=tailwind-css) ![Flask](https://img.shields.io/badge/Flask-3.0-000000?logo=flask) ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.17-ff6f00?logo=tensorflow)
+---
 
-> Multi-step camera guidance, smart face validation, and TensorFlow-powered predictions delivered through a polished Next.js interface.
+## 🧭 Quick Navigation
+- [Overview](#-overview)
+- [Feature Spotlight](#-feature-spotlight)
+- [Experience & Visual Design](#-experience--visual-design)
+- [Tech Stack](#-tech-stack)
+- [Architecture](#-architecture)
+- [Project Layout](#-project-layout)
+- [Getting Started](#-getting-started)
+- [Running the Apps](#-running-the-apps)
+- [API Reference](#-api-reference)
+- [Model Notes](#-model-notes)
+- [Troubleshooting](#-troubleshooting)
+- [Roadmap](#-roadmap)
+- [Acknowledgements](#-acknowledgements)
 
-## Table of Contents
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [System Architecture](#system-architecture)
-- [User Experience Highlights](#user-experience-highlights)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Running the Apps](#running-the-apps)
-- [API Reference](#api-reference)
-- [Model Notes](#model-notes)
-- [Troubleshooting](#troubleshooting)
-- [Roadmap Ideas](#roadmap-ideas)
-- [Acknowledgements](#acknowledgements)
+## 🌈 Overview
+Face Shape Detection AI memadukan **Next.js** untuk antarmuka multi-step yang memukau, **face-api.js** untuk validasi wajah di browser, dan **TensorFlow** di backend guna memprediksi bentuk wajah (Heart, Oblong, Oval, Round, Square).
 
-## Overview
-Face Shape Detection AI membantu pengguna menemukan bentuk wajah melalui dua alur utama:
-1. **Pemindaian kamera multi-langkah** dengan umpan balik live metrics agar setiap sudut wajah terekam dengan akurat.
-2. **Upload foto tunggal** dengan validasi otomatis (menggunakan Face API) sebelum diproses model TensorFlow.
+Pengguna dapat:
+1. 📸 Menjalankan wizard kamera tiga langkah dengan live metrics berwarna untuk memastikan pose sempurna.
+2. 🖼️ Mengunggah foto tunggal yang otomatis diverifikasi sebelum dianalisis model.
 
-Aplikasi ini memadukan pengalaman modern di sisi frontend Next.js dengan model klasifikasi EfficientNetB2 yang dilatih pada lima kategori bentuk wajah (Heart, Oblong, Oval, Round, Square).
+## 🎯 Feature Spotlight
+| 🌟 Highlight | Deskripsi |
+| --- | --- |
+| 🔁 **Multi-Step Camera Flow** | Sidebar progresif dengan badge neon, kartu preview tiap orientasi, serta tombol capture yang responsif terhadap kualitas wajah. |
+| 📊 **Live Metrics Overlay** | Panel semi-transparan yang menampilkan skor deteksi, posisi, dan skala secara real-time (80 ms interval). Warna berubah (emerald/amber/slate) mengikuti kondisi wajah. |
+| 🧠 **AI-Powered Predictions** | Backend Flask memuat EfficientNetB2 yang sudah fine-tuned untuk lima kelas bentuk wajah. Confidence ditampilkan di UI dengan tipografi besar. |
+| 🛡️ **Smart Validation** | Pada upload flow, `face-api.js` mengecek keberadaan wajah sebelum file dikirim. Pesan error dirancang ramah dan informatif. |
+| 🎨 **Glassmorphism UI** | Tailwind menghadirkan lapisan blur, shadow lembut, tombol gradien, dan micro animations (hover lift, ping indicator, animated status chips). |
+| 📱 **Responsive by Design** | Grid adaptif menjaga pengalaman tetap imersif di mobile hingga desktop besar. |
 
-## Key Features
-- **Camera Wizard**: Tiga langkah pengambilan foto (depan, kiri, kanan) dengan indikator kualitas dan live scoring.
-- **Animated Guidance**: Overlay, badges, dan status lighting yang berubah warna (emerald, amber, slate) untuk memberi sinyal kesiapan capture.
-- **Smart Validation**: Upload flow memverifikasi keberadaan wajah melalui `face-api.js` sebelum mengirim gambar ke backend.
-- **Real-time Metrics**: Deteksi skor overall, posisi, dan skala wajah diperbarui setiap 80 ms demi hasil yang stabil.
-- **Reactive State Management**: `@tanstack/react-query` menangani state asynchronous, optimistic reset, dan feedback error.
-- **Responsive Layouts**: Antarmuka dipoles dengan Tailwind CSS beserta efek glassmorphism, drop shadow, dan responsive grid.
+## 💫 Experience & Visual Design
+- **Hero CTA & Links**: Halaman kamera dan upload menampilkan header dengan badge `Face Shape AI`, CTA sekunder, dan copywriting yang memotivasi.
+- **Animated Feedback**: Indikator ping, transisi hover, serta status teks yang berubah warna membantu pengguna sepanjang perjalanan.
+- **Thematic Consistency**: Palet warna biru-ungu dengan aksen emerald menjaga nuansa futuristik namun ramah.
+- **Screenshots / Motion** *(tambahkan file Anda di folder `frontend/docs/` untuk menampilkan gambar nyata)*:
+  - `![Camera Flow](docs/camera-flow.png)`
+  - `![Upload Validation](docs/upload-validation.gif)`
 
-## System Architecture
-```mermaid
-graph TD
-  A[User Browser] -->|Next.js App Router| B[Camera & Upload UI]
-  B -->|Fetch / Face API| C[Frontend Helpers]
-  C -->|FormData| D[Flask API /predict]
-  D -->|TensorFlow EfficientNetB2| E[Model Weights best_model.keras]
-  E -->|Prediction JSON| D
-  D -->|Response| B
-```
-
-## User Experience Highlights
-- **Landing Flow**: Pengguna memilih antara pemindaian kamera atau unggah foto. Setiap halaman memiliki header yang konsisten dan CTA sekunder.
-- **Camera Guidance**:
-  - Sidebar menampilkan progress badge, status tiap orientasi, preview thumbnail, dan CTA capture.
-  - Overlay live metrics muncul sebagai kartu semi-transparan yang memperlihatkan skor deteksi, posisi, dan skala.
-  - Status teks disertai warna dinamis untuk membimbing pengguna agar memposisikan wajah dengan tepat.
-- **Upload Journey**:
-  - Drag and drop input (via native file input) dengan preview langsung.
-  - Validasi asynchronous dengan spinner dan penanganan error yang informatif.
-  - Komponen hasil prediksi menunjukkan bentuk wajah dan confidence dalam tipografi besar.
-- **Animations & Micro Interactions**:
-  - Ping animation saat analisis berlangsung.
-  - Transisi hover pada tombol menggunakan kelas Tailwind.
-  - Shadow dan blur yang menimbulkan kesan glass UI serasi dengan tema gelap.
-
-## Tech Stack
+## 🛠 Tech Stack
 **Frontend**
-- Next.js 15 (App Router, React 19, TypeScript)
-- Tailwind CSS 4 beta + CSS variables
-- `@tanstack/react-query` untuk data fetching dan caching
-- `face-api.js` untuk validasi kehadiran wajah di sisi client
-- `react-webcam` untuk akses kamera berbasis browser
+- Next.js 15 (App Router) + React 19
+- TypeScript dengan path-based modularisasi
+- Tailwind CSS v4 beta (utility-first + custom CSS variables)
+- `@tanstack/react-query` untuk data-fetching dan state async
+- `face-api.js`, `react-webcam`
 
 **Backend**
-- Flask + CORS
-- TensorFlow 2.17 dengan EfficientNetB2 (fine-tuned)
-- Pillow dan NumPy untuk preprocessing gambar
+- Flask 3 + CORS
+- TensorFlow 2.17 (EfficientNetB2)
+- Pillow, NumPy untuk preprocessing gambar
 
-## Project Structure
+## 🧱 Architecture
+```mermaid
+graph TD
+  A[User Browser] -->|Next.js App Router| B[Camera & Upload Experience]
+  B -->|face-api.js validations| C[Client Utilities]
+  B -->|FormData POST| D[Flask API /predict]
+  D -->|EfficientNetB2| E[best_model.keras]
+  E -->|Confidence & Shape| D
+  D -->|JSON response| B
+```
+
+## 🗂 Project Layout
 ```
 faceshapedetection_project/
 ├── backend/
 │   ├── models/best_model.keras
 │   ├── requirements.txt
-│   └── src/app.py
+│   └── src/app.py                # Flask + TensorFlow inference API
 └── frontend/
-    ├── public/models/              # Face API model weights (dimuat di client)
+    ├── public/models/            # Face API model weights (client-side)
     ├── src/app/
     │   ├── camera/
-    │   │   ├── components/         # CameraHeader, CaptureSidebar, CameraViewport, PredictionSummary
+    │   │   ├── components/       # CameraHeader, CaptureSidebar, CameraViewport, PredictionSummary
     │   │   ├── hooks/useCameraFlow.ts
     │   │   ├── constants.ts
-    │   │   ├── types.ts
+    │   │   ├── types.ts          # Shared typings (metrics, orientations, etc.)
     │   │   └── utils.ts
     │   ├── upload/
-    │   │   ├── components/         # Upload UI fragments & alerts
+    │   │   ├── components/       # UploadForm, PredictionResult, ErrorAlert, etc.
     │   │   └── hooks/useUploadFlow.ts
     │   ├── layout.tsx
     │   └── page.tsx
-    ├── global.d.ts
     ├── tailwind.config.ts
     ├── tsconfig.json
     └── README.md (dokumen ini)
 ```
 
-## Getting Started
-### Prasyarat
-- Node.js 20+
-- npm (atau pnpm/yarn/bun)
-- Python 3.10+
-- Pipenv atau virtualenv (opsional, namun disarankan)
+## 🚀 Getting Started
+> Jalankan backend & frontend di terminal terpisah.
 
-### Instalasi Backend
+### 1. Backend Setup
 ```bash
 cd backend
 python -m venv .venv
-.venv\Scripts\activate   # Windows
+.venv\Scripts\activate  # Windows
 pip install -r requirements.txt
+python src/app.py
 ```
+Backend berjalan di `http://127.0.0.1:5000`.
 
-### Instalasi Frontend
+### 2. Frontend Setup
 ```bash
 cd frontend
 npm install
-```
-
-## Running the Apps
-Jalankan kedua layanan pada terminal terpisah.
-
-**Backend**
-```bash
-cd backend
-.venv\Scripts\activate
-python src/app.py
-```
-Server berjalan pada `http://127.0.0.1:5000` dan menyediakan endpoint `/predict`.
-
-**Frontend**
-```bash
-cd frontend
 npm run dev
 ```
-Buka `http://localhost:3000` untuk mengakses UI.
+Akses UI di `http://localhost:3000`.
 
-> Pastikan folder `frontend/public/models` berisi file model Face API (`tiny_face_detector_model`, dll). Apabila belum ada, unduh dari repository resmi face-api.js dan letakkan di sana.
+⚠️ **Important**: Pastikan folder `frontend/public/models` berisi file-face-api.js (`tiny_face_detector_model-weights_manifest.json`, dll). Unduh dari repository resmi face-api.js apabila belum tersedia.
 
-## API Reference
-### POST /predict
-- **Endpoint**: `http://127.0.0.1:5000/predict`
+## 🧪 Running Lint
+```bash
+npm run lint
+```
+Pastikan linting hijau sebelum melakukan commit atau deploy.
+
+## 🔌 API Reference
+### `POST /predict`
+- **URL**: `http://127.0.0.1:5000/predict`
 - **Request**: `multipart/form-data` dengan field `image`
-- **Optional fields** (dikirim oleh kamera flow):
-  - `face_detection_score`
-  - `face_overall_score`
-  - `face_center_score`
-  - `face_size_score`
+- **Optional Meta** (dikirm kamera flow): `face_detection_score`, `face_overall_score`, `face_center_score`, `face_size_score`
 
-#### Response
 ```json
+// success
 {
   "shape": "Oval",
   "confidence": 0.8421
 }
 ```
 
-#### Error
 ```json
+// error example
 {
   "error": "Gagal melakukan prediksi."
 }
 ```
-Status code 400 diberikan saat file tidak ditemukan, sedangkan 500 menandakan kendala internal (model tidak termuat atau inferensi gagal).
 
-## Model Notes
-- Arsitektur: EfficientNetB2 (top layer custom dense softmax lima kelas).
-- Input size: 244x244 piksel RGB.
-- Bobot disimpan pada `backend/models/best_model.keras` dan dimuat saat startup.
-- Preprocessing: resize, konversi ke array, expand dims, tanpa normalisasi tambahan (mengikuti training pipeline).
+## 🧠 Model Notes
+- EfficientNetB2 tanpa top (pooling=avg) + dense softmax 5 kelas.
+- Input: 244×244 RGB, di-preprocess dengan resize, `img_to_array`, `expand_dims`.
+- Bobot: `backend/models/best_model.keras`.
+- Pastikan environment mendukung TensorFlow (CPU dengan AVX atau GPU).
 
-## Troubleshooting
-| Masalah | Penyebab Umum | Solusi |
+## 🛟 Troubleshooting
+| Issue | Penyebab | Perbaikan |
 | --- | --- | --- |
-| UI menampilkan pesan memuat model terus menerus | File model Face API belum tersedia di `public/models` | Pastikan semua file `.json` dan `.bin` face-api.js sudah diunduh |
-| Error CORS saat memanggil API | Backend belum dijalankan atau port berbeda | Jalankan Flask app di port 5000 atau perbarui `API_URL` di frontend |
-| Prediksi lambat | Perangkat tanpa akselerasi GPU | Jalankan backend di lingkungan dengan dukungan AVX/GPU atau gunakan batching |
-| Tidak ada wajah terdeteksi | Pencahayaan kurang / kamera diblok | Pastikan wajah berada di tengah frame dan pencahayaan cukup |
+| UI stuck "Memuat model" | File Face API belum diunduh | Pastikan seluruh berkas `.json` dan `.bin` tersedia di `public/models`. |
+| `fetch` gagal / CORS | Backend belum hidup atau port berbeda | Jalankan Flask di port 5000 atau sesuaikan `API_URL` pada frontend. |
+| Prediksi lama | Hardware tanpa akselerasi | Gunakan mesin dengan GPU / AVX, atau lakukan batching. |
+| Wajah tidak terdeteksi | Pencahayaan minim / framing buruk | Posisikan wajah di tengah dengan pencahayaan cukup. |
 
-## Roadmap Ideas
-- Tambahkan penyimpanan riwayat prediksi untuk pengguna.
-- Integrasi service worker agar model Face API dapat di-cache offline.
-- Implementasi mode dark-light toggle dan pilihan bahasa.
-- Deploy backend sebagai serverless function dengan model quantization.
+## 🧭 Roadmap
+- 🗂️ Simpan riwayat prediksi pengguna & rekomendasi style personal.
+- 🌐 Tambahkan dukungan multi-bahasa & mode gelap/terang.
+- 📱 PWA + caching model agar bisa semi-offline.
+- ☁️ Deploy backend sebagai serverless function dengan model terkuantisasi.
 
-## Acknowledgements
-- [face-api.js](https://github.com/justadudewhohacks/face-api.js) untuk kemampuan deteksi wajah di browser.
-- Komunitas TensorFlow atas arsitektur EfficientNet.
-- Next.js dan React teams atas tooling modern yang memudahkan pengembangan.
+## 🙌 Acknowledgements
+- [`face-api.js`](https://github.com/justadudewhohacks/face-api.js) untuk kemampuan deteksi wajah di browser.
+- Tim TensorFlow atas arsitektur EfficientNet.
+- Komunitas Next.js & React untuk tooling modern yang mempercepat pengembangan UI.
 
 ---
 
-Dibangun dengan fokus pada pengalaman pengguna: interaktif, informatif, dan siap dikembangkan lebih lanjut.
+<div align="center">
+  <p>Crafted with 💙 to make face-shape discovery feel futuristic, friendly, and fun.</p>
+</div>
